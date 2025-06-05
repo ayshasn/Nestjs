@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { StoreProduct } from "src/store-product/store-product.entity";
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from "typeorm";
 
 @Entity()
 export class Product {
@@ -16,4 +17,8 @@ export class Product {
 
   @Column({ default: true })
   isActive: boolean;
+  // storeProducts: any;
+
+  @OneToMany(() => StoreProduct, (storeProduct) => storeProduct.product)
+  storeProducts: StoreProduct[];
 }
