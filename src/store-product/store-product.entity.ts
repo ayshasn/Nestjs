@@ -23,4 +23,6 @@ export class StoreProduct {
 
   @Column({ default: true })
   isActive: boolean;
+
+  
 }

@@ -3,26 +3,27 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { Store } from "./store.entity";
 import { CreateStoreDto } from "./dto/create-store.dto";
+import { PaginationQueryDto } from "./dto/pagination-query.dto";
 
 @Injectable()
 export class StoreService {
+  storeRepo: any;
   constructor(
     @InjectRepository(Store)
     private storeRepository: Repository<Store>,
   ) {}
 
-  async findAll(
-    page: number,
-    limit: number,
-  ): Promise<{ data: Partial<Store>[]; total: number }> {
-    const [stores, total] = await this.storeRepository.findAndCount({
-      select: ["id", "name", "location", "category"], // only brief fields
-      skip: (page - 1) * limit,
-      take: limit,
-    });
+async findAll( query: PaginationQueryDto) {
+  const page = query.page || 1;
+  const limit = query.limit || 10;
+  const [stores, total] = await this.storeRepository.findAndCount({
+  select: ["id", "name", "location", "category"],
+  skip: (page - 1) * limit,
+  take: limit,
+});
+  return { data: stores, total}
+}
 
-    return { data: stores, total };
-  }
 
   async getStoreByIdWithProducts(id: number) {
     const store = await this.storeRepository.findOne({
@@ -35,10 +36,9 @@ export class StoreService {
     }
 
     // Extract products from storeProducts
-    // const products = store.storeProducts.map((sp) => sp.product);
+    const products = store.storeProducts.map((sp) => sp.product);
 
     return store;
-    // return {
     //   store: {
     //     id: store.id,
     //     name: store.name,
@@ -54,6 +54,7 @@ export class StoreService {
     //     description: p.description,
     //     price: p.price,
     //     isActive: p.isActive,
+    //     stock: p.storeProducts
     //   })),
     // };
   }
