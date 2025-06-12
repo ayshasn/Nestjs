@@ -2,17 +2,14 @@ import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { Product } from "./product.entity";
+import { ProductRepository } from "./product.repository";
 
 @Injectable()
 export class ProductService {
-  constructor(
-    @InjectRepository(Product)
-    private productRepository: Repository<Product>,
-  ) {}
+  constructor(private readonly productRepository: ProductRepository) {}
 
   create(product: Partial<Product>) {
-    const newProduct = this.productRepository.create(product);
-    return this.productRepository.save(newProduct);
+    return this.productRepository.createProduct(product);
   }
 
   //   update(id: number, product: Partial<Product>) {
@@ -20,32 +17,16 @@ export class ProductService {
   //   }
 
   async update(id: number, productData: Partial<Product>) {
-    const product = await this.productRepository.findOneBy({ id });
-    if (!product) {
-      throw new NotFoundException(`Product with ID ${id} not found`);
-    }
-
-    const updatedProduct = Object.assign(product, productData);
-    return this.productRepository.save(updatedProduct);
+    return this.productRepository.updateProduct(id, productData);
   }
+
 
   // disable(id: number) {
   //   return this.productRepository.update(id, { isActive: false });
   // }
 
-  async disable(id: number) {
-    const product = await this.productRepository.findOneBy({ id });
+async disable(id: number) {
+  return this.productRepository.disableProduct(id);
+}
 
-    if (!product) {
-      return { message: `Product with ID ${id} not found.` };
-    }
-
-    if (!product.isActive) {
-      return { message: `Product with ID ${id} is already disabled.` };
-    }
-
-    await this.productRepository.update(id, { isActive: false });
-
-    return { message: `Product with ID ${id} has been disabled successfully.` };
-  }
 }

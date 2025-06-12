@@ -20,5 +20,8 @@ export class Store {
 
   @OneToMany(() => StoreProduct, (storeProduct) => storeProduct.store)
   storeProducts: StoreProduct[];
+  product: any;
+  price: any;
+  stock: any;
   // field: any;
 }
